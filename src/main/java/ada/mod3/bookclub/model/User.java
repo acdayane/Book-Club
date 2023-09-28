@@ -28,4 +28,6 @@ public class User {
     @Column(nullable = false)
     private Integer password;
 
+    private Boolean active; //findAllActives
+
 }
