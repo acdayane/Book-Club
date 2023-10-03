@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,9 @@ import ada.mod3.bookclub.controller.dto.UserResponse;
 import ada.mod3.bookclub.model.User;
 import ada.mod3.bookclub.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @RestController
 public class UserController {
@@ -22,15 +26,25 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @GetMapping("/users")
+    public List<User> getUsers() {
+        return userService.getUsers();
+    }
+
     @PostMapping("/sign-up")
     public ResponseEntity<UserResponse> saveUser(@Valid @RequestBody UserRequest userDTO) {
         UserResponse user =  userService.saveUser(userDTO);
         return ResponseEntity.created(URI.create("/user/" + user.getId())).body(user);
+    }   
+
+    @PutMapping("users/{id}")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Integer id, @RequestBody UserRequest userRequest) {
+        return  ResponseEntity.ok(userService.updateUser(id, userRequest));
     }
 
-    @GetMapping("/users")
-    public List<User> getUsers() {
-        return userService.getUsers();
+    @DeleteMapping("users/{id}")
+    public void deleteUser(@PathVariable Integer id) {
+        userService.deleteUser(id);
     }
 
 }
