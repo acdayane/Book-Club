@@ -68,14 +68,14 @@ public class UserService {
         if(userResponse.isPresent()){
             return UserConvert.toResponse(userResponse.get());
         } else {
-            throw new RuntimeException("Not found user");
+            throw new RuntimeException("User not found");
         }
     }
 
     public List<UserResponse> getAllByName(String name){
         List<User> userResponse =  userRepository.findAllByNameIgnoreCase(name);
         if(userResponse.isEmpty()){
-          throw new RuntimeException("Not found name");
+          throw new RuntimeException("Name not found");
         }
         return UserConvert.toResponseList(userRepository.findAllByNameIgnoreCase(name));
     }
