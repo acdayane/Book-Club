@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import ada.mod3.bookclub.controller.dto.UserRequest;
@@ -19,33 +19,33 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    public List<User> getUsers () {
-        return userRepository.findAll();
-    }
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
-    public UserResponse saveUser (UserRequest userDTO) {
+    public UserResponse saveUser(UserRequest userDTO) {
         User user = UserConvert.toEntity(userDTO);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setActive(true);
         User userEntity = userRepository.save(user);
         return UserConvert.toResponse(userEntity);
     }
 
-    public UserResponse updateUser (Integer id, UserRequest userRequest) {
-        Optional<User> optionalUser = userRepository.findById(id);
+    public UserResponse updateUser(Integer id, UserRequest userRequest) {
+        Optional<User> user =  userRepository.findById(id);
 
-        if (optionalUser.isPresent()) {
-            User existingUser = optionalUser.get();
+        if (user.isPresent()) {
+            User existingUser = user.get();
     
             existingUser.setName(userRequest.getName());
             existingUser.setEmail(userRequest.getEmail());
-            existingUser.setPassword(userRequest.getPassword());
+            existingUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
             existingUser.setActive(true);
     
             User updatedUser = userRepository.save(existingUser);
     
             return UserConvert.toResponse(updatedUser);
         } else {
-            throw new RuntimeException("Usuário não encontrado!");
+            throw new RuntimeException("Can not update user");
         }
     }
 
@@ -53,5 +53,30 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow();
         user.setActive(false);
         userRepository.save(user);
+    }
+
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
+
+    public UserResponse getUserByEmail(String email) {     
+        return UserConvert.toResponse(userRepository.findByEmail(email));
+    }
+
+    public UserResponse getUserById(Integer id) {     
+        Optional<User> userResponse =  userRepository.findById(id);
+        if(userResponse.isPresent()){
+            return UserConvert.toResponse(userResponse.get());
+        } else {
+            throw new RuntimeException("Not found user");
+        }
+    }
+
+    public List<UserResponse> getAllByName(String name){
+        List<User> userResponse =  userRepository.findAllByNameIgnoreCase(name);
+        if(userResponse.isEmpty()){
+          throw new RuntimeException("Not found name");
+        }
+        return UserConvert.toResponseList(userRepository.findAllByNameIgnoreCase(name));
     }
 }

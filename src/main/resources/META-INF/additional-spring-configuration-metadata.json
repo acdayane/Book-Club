@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "config.token.secret",
+  "type": "java.lang.String",
+  "description": "A description for 'config.token.secret'"
+}]}
