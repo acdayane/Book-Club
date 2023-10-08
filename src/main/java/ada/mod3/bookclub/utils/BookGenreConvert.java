@@ -16,18 +16,18 @@ public class BookGenreConvert {
     }
 
     public static BookGenreResponse toResponse(BookGenre genre) {
-        BookGenreResponse bookGenreReponse = new BookGenreResponse();
-        bookGenreReponse.setId(genre.getId());
-        bookGenreReponse.setName(genre.getName());
-        return bookGenreReponse;
+        BookGenreResponse bookGenreResponse = new BookGenreResponse();
+        bookGenreResponse.setId(genre.getId());
+        bookGenreResponse.setName(genre.getName());
+        return bookGenreResponse;
     }
 
     public static List<BookGenreResponse> toResponseList(List<BookGenre> genres){
-    List<BookGenreResponse> genreResponses = new ArrayList<>();
-    for (BookGenre genre : genres) {
-        BookGenreResponse genreResponse = BookGenreConvert.toResponse(genre);
-        genreResponses.add(genreResponse);
+        List<BookGenreResponse> genreResponses = new ArrayList<>();
+        for (BookGenre genre : genres) {
+            BookGenreResponse genreResponse = BookGenreConvert.toResponse(genre);
+            genreResponses.add(genreResponse);
+        }
+        return genreResponses;
     }
-    return genreResponses;
-  }
 }

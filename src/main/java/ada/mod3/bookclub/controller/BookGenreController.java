@@ -38,7 +38,7 @@ public class BookGenreController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BookGenreResponse> getUser(@PathVariable Integer id) {
+    public ResponseEntity<BookGenreResponse> getGenre(@PathVariable Integer id) {
         return ResponseEntity.ok(bookGenreService.getGenreById(id));
     }
 
