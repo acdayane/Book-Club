@@ -35,8 +35,8 @@
 - Book
 ```json
 {
-  "title": "150 Tons de Cinza",
-  "author": "E L James",
-  "genre_Id": 1
+	"title": "150 Tons de Cinza",
+	"author": "E L James",
+	"genre_Id": 1
 }
 ```
