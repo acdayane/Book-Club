@@ -48,7 +48,7 @@ public class BookGenreController {
     }
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<List<BookGenreResponse>> getGenderByName(@PathVariable String name){
+    public ResponseEntity<List<BookGenreResponse>> getGenreByName(@PathVariable String name){
         return ResponseEntity.ok(bookGenreService.getByName(name));
     }
     

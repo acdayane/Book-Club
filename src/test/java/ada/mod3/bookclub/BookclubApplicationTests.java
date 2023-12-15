@@ -1,4 +1,4 @@
-package ada.java.bookclub;
+package ada.mod3.bookclub;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
