@@ -50,7 +50,7 @@ public class User implements UserDetails {
         return this.email;
     }
 
-     @Override
+    @Override
     public String getPassword() {
         return this.password;
     }

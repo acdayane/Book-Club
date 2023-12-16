@@ -175,4 +175,17 @@ public class BookGenreControllerIntegrationTest {
         );
     }
 
+    @Test
+    public void Should_ThrowException_When_TryGetString() throws Exception {        
+        Assertions.assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                mockMvc.perform(
+                    MockMvcRequestBuilders.get("book-genre/name/111111111")
+                        .accept(MediaType.APPLICATION_JSON)
+                );
+            }
+        }); 
+    }
+
 }

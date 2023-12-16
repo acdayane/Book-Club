@@ -59,8 +59,13 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public UserResponse getUserByEmail(String email) {     
-        return UserConvert.toResponse(userRepository.findByEmail(email));
+    public UserResponse getUserByEmail(String email) {   
+        User userResponse =  userRepository.findByEmail(email);
+        if(userResponse == null){
+            throw new RuntimeException("User not found");
+        } else {
+            return UserConvert.toResponse(userResponse);
+        }
     }
 
     public UserResponse getUserById(Integer id) {     
