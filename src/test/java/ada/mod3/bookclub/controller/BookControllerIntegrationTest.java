@@ -153,12 +153,12 @@ public class BookControllerIntegrationTest {
         bookGenre.setName("int-test");
         bookGenreRepository.save(bookGenre);
 
-        Book bookToDelete = new Book();
-        bookToDelete.setTitle("int-test");
-        bookToDelete.setAuthor("int-test");
-        bookToDelete.setGenre(bookGenre);
-        bookRepository.save(bookToDelete);
-        Integer bookId = bookToDelete.getId();
+        Book bookToGet = new Book();
+        bookToGet.setTitle("int-test");
+        bookToGet.setAuthor("int-test");
+        bookToGet.setGenre(bookGenre);
+        bookRepository.save(bookToGet);
+        Integer bookId = bookToGet.getId();
 
         mockMvc.perform(
             MockMvcRequestBuilders.get("/book/{id}", bookId)
@@ -171,5 +171,69 @@ public class BookControllerIntegrationTest {
             MockMvcResultMatchers.jsonPath("$.title").value("int-test")
         );
     }
+
+    @Test
+    public void Should_GetAllBooks() throws Exception {        
+        BookGenre bookGenre = new BookGenre();
+        bookGenre.setName("int-test");
+        bookGenreRepository.save(bookGenre);
+
+        Book book = new Book();
+        book.setTitle("int-test");
+        book.setAuthor("int-test");
+        book.setGenre(bookGenre);
+        bookRepository.save(book);
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/book/all")
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(
+            MockMvcResultHandlers.print()
+        ).andExpect(
+            MockMvcResultMatchers.status().is2xxSuccessful()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$").isArray()
+        );
+    }
+
+    @Test
+    public void Should_GetBooksList_When_TitleOrAuthorExist() throws Exception {        
+        BookGenre bookGenre = new BookGenre();
+        bookGenre.setName("int-test");
+        bookGenreRepository.save(bookGenre);
+
+        Book book = new Book();
+        book.setTitle("int-test");
+        book.setAuthor("int-test");
+        book.setGenre(bookGenre);
+        bookRepository.save(book);
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/book/search/int")
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(
+            MockMvcResultHandlers.print()
+        ).andExpect(
+            MockMvcResultMatchers.status().is2xxSuccessful()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$").isArray()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$[0].title").value("int-test")
+        );
+    }
+
+    @Test
+    public void Should_ThrowException_When_TitleOrAuthorDontExist() throws Exception {        
+        Assertions.assertThrows(ServletException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                mockMvc.perform(
+                    MockMvcRequestBuilders.get("/book/{id}", 000)
+                        .accept(MediaType.APPLICATION_JSON)
+                );
+            }
+        }); 
+    }
+
 
 }
