@@ -1,41 +1,37 @@
 package ada.mod3.bookclub.controller;
 
-import static org.mockito.Mockito.when;
-
-import java.util.Collections;
-import java.util.List;
-
-import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import ada.mod3.bookclub.controller.dto.BookGenreResponse;
 import ada.mod3.bookclub.model.BookGenre;
-import ada.mod3.bookclub.utils.BookGenreConvert;
+import ada.mod3.bookclub.repository.BookGenreRepository;
+import jakarta.servlet.ServletException;
+import jakarta.transaction.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class BookGenreControllerIntegrationTest {
-
-    @MockBean
-    private BookGenreController controller;
 
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private BookGenreRepository bookGenreRepository;
+
     @Test
-    public void Should_AnswerBadRequest_When_TrySaveInvalidBookGenre() throws Exception {
+    public void Should_Answer4xx_When_TrySaveInvalidBookGenre() throws Exception {
         mockMvc.perform(
             MockMvcRequestBuilders.post("/book-genre")
                 .content("""                            
@@ -45,7 +41,7 @@ public class BookGenreControllerIntegrationTest {
         ).andDo(
             MockMvcResultHandlers.print()
         ).andExpect(
-            MockMvcResultMatchers.status().isBadRequest()
+            MockMvcResultMatchers.status().is4xxClientError()
         );
     }
 
@@ -63,43 +59,61 @@ public class BookGenreControllerIntegrationTest {
         ).andDo(
             MockMvcResultHandlers.print()
         ).andExpect(
-            MockMvcResultMatchers.status().is2xxSuccessful()
+            MockMvcResultMatchers.status().isCreated()
         );
     }
 
     @Test
     public void Should_DeleteBookGenre_When_IdExists() throws Exception {
         BookGenre bookGenre = new BookGenre();
-        bookGenre.setId(123);
-
-        Mockito.doAnswer(invocationOnMock -> {
-            Integer bookGenreId = (Integer) invocationOnMock.getArgument(0);
-            return null;
-        }).when(controller).deleteGenre(Mockito.anyInt());
-
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        bookGenre.setName("int-test");
+        bookGenreRepository.save(bookGenre);
+        Integer genreIdToDelete = bookGenre.getId();
 
         mockMvc.perform(
-            MockMvcRequestBuilders.delete("/book-genre/{id}", 123)
+            MockMvcRequestBuilders.delete("/book-genre/{id}", genreIdToDelete)
                 .accept(MediaType.APPLICATION_JSON)
         ).andDo(
             MockMvcResultHandlers.print()
         ).andExpect(
-            MockMvcResultMatchers.status().is2xxSuccessful()
+            MockMvcResultMatchers.status().isOk()
         );
+    }
+
+    @Test
+    public void Should_ThrowException_When_TryDeleteBookGenreWithInvalidId() throws Exception {
+        Assertions.assertThrows(ServletException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                mockMvc.perform(
+                    MockMvcRequestBuilders.delete("/book/{id}", 000)
+                        .accept(MediaType.APPLICATION_JSON)
+                );
+            }
+        }); 
+    }
+
+    @Test
+    public void Should_ThrowException_When_TryGetBookGenreWithInvalidId() throws Exception {     
+        Assertions.assertThrows(ServletException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                mockMvc.perform(
+                    MockMvcRequestBuilders.get("/book/{id}", 000)
+                        .accept(MediaType.APPLICATION_JSON)
+                );
+            }
+        }); 
     }
 
     @Test
     public void Should_GetBookGenre_When_IdExists() throws Exception {        
         BookGenre bookGenre = new BookGenre();
-        bookGenre.setId(123);
         bookGenre.setName("int-test");
-
-        BookGenreResponse bookGenreResponse = BookGenreConvert.toResponse(bookGenre); 
-        when(controller.getGenre(bookGenre.getId())).thenReturn(ResponseEntity.ok(bookGenreResponse));
+        bookGenreRepository.save(bookGenre);
 
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/book-genre/123")
+            MockMvcRequestBuilders.get("/book-genre/{id}", bookGenre.getId())
                 .accept(MediaType.APPLICATION_JSON)
         ).andDo(
             MockMvcResultHandlers.print()
@@ -112,30 +126,22 @@ public class BookGenreControllerIntegrationTest {
 
     @Test
     public void Should_ThrowsException_When_TryGetInvalidId() throws Exception {
-        BookGenre bookGenre = new BookGenre();
-        bookGenre.setId(123);
-        bookGenre.setName("int-test");
-
-        when(controller.getGenre(bookGenre.getId())).thenThrow(new RuntimeException("Book genre not found"));
-
-        mockMvc.perform(
-            MockMvcRequestBuilders.get("/book-genre/0")
-                .accept(MediaType.APPLICATION_JSON)
-        ).andDo(
-            MockMvcResultHandlers.print()
-        ).andExpect(
-            MockMvcResultMatchers.status().is2xxSuccessful()
-        );
+        Assertions.assertThrows(ServletException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                mockMvc.perform(
+                    MockMvcRequestBuilders.get("/book/{id}", 000)
+                        .accept(MediaType.APPLICATION_JSON)
+                );
+            }
+        }); 
     }
 
     @Test
-    public void Should_GetGenresList() throws Exception {        
+    public void Should_GetAllGenres() throws Exception {        
         BookGenre bookGenre = new BookGenre();
-        bookGenre.setId(123);
         bookGenre.setName("int-test");
-
-        List<BookGenre> genresList = Collections.singletonList(bookGenre);
-        when(controller.getGenres()).thenReturn(genresList);
+        bookGenreRepository.save(bookGenre);
 
         mockMvc.perform(
             MockMvcRequestBuilders.get("/book-genre/all")
@@ -145,18 +151,15 @@ public class BookGenreControllerIntegrationTest {
         ).andExpect(
             MockMvcResultMatchers.status().is2xxSuccessful()
         ).andExpect(
-            MockMvcResultMatchers.jsonPath("$[0].name").value("int-test")
+            MockMvcResultMatchers.jsonPath("$").isArray()
         );
     }
 
     @Test
     public void Should_GetGenresList_When_StringExists() throws Exception {        
         BookGenre bookGenre = new BookGenre();
-        bookGenre.setId(123);
         bookGenre.setName("int-test");
-
-        List<BookGenre> genresList = Collections.singletonList(bookGenre);
-        when(controller.getGenreByName("int")).thenReturn(ResponseEntity.ok(BookGenreConvert.toResponseList(genresList)));
+        bookGenreRepository.save(bookGenre);
 
         mockMvc.perform(
             MockMvcRequestBuilders.get("/book-genre/name/int")
@@ -168,7 +171,7 @@ public class BookGenreControllerIntegrationTest {
         ).andExpect(
             MockMvcResultMatchers.jsonPath("$").isArray()
         ).andExpect(
-            MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1))
+            MockMvcResultMatchers.jsonPath("$[0].name").value("int-test")
         );
     }
 

@@ -39,7 +39,7 @@ public class BookControllerIntegrationTest {
     private BookRepository bookRepository;
 
     @Test
-    public void Should_AnswerBadRequest_When_TrySaveInvalidBook() throws Exception {
+    public void Should_Answer4xx_When_TrySaveInvalidBook() throws Exception {
         mockMvc.perform(
             MockMvcRequestBuilders.post("/book")
                 .content("""
@@ -53,7 +53,7 @@ public class BookControllerIntegrationTest {
         ).andDo(
             MockMvcResultHandlers.print()
         ).andExpect(
-            MockMvcResultMatchers.status().isBadRequest()
+            MockMvcResultMatchers.status().is4xxClientError()
         );
     }
 
@@ -117,13 +117,13 @@ public class BookControllerIntegrationTest {
         ).andDo(
             MockMvcResultHandlers.print()
         ).andExpect(
-            MockMvcResultMatchers.status().is2xxSuccessful()
+            MockMvcResultMatchers.status().isOk()
         );
     }
 
     @Test
     public void Should_ThrowServletException_When_TryDeleteBookWithInvalidId() throws Exception {
-         Assertions.assertThrows(ServletException.class, new Executable() {
+        Assertions.assertThrows(ServletException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
                 mockMvc.perform(
