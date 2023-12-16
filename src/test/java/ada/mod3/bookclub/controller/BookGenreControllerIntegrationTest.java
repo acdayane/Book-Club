@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import ada.mod3.bookclub.controller.dto.BookGenreResponse;
 import ada.mod3.bookclub.model.BookGenre;
@@ -68,14 +69,18 @@ public class BookGenreControllerIntegrationTest {
 
     @Test
     public void Should_DeleteBookGenre_When_IdExists() throws Exception {
+        BookGenre bookGenre = new BookGenre();
+        bookGenre.setId(123);
+
         Mockito.doAnswer(invocationOnMock -> {
-            BookGenre bookGenre = (BookGenre) invocationOnMock.getArgument(0);
-            bookGenre.setId(123);
+            Integer bookGenreId = (Integer) invocationOnMock.getArgument(0);
             return null;
-        }).when(controller).saveGenre(Mockito.any());
+        }).when(controller).deleteGenre(Mockito.anyInt());
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
         mockMvc.perform(
-            MockMvcRequestBuilders.delete("/book-genre/123")
+            MockMvcRequestBuilders.delete("/book-genre/{id}", 123)
                 .accept(MediaType.APPLICATION_JSON)
         ).andDo(
             MockMvcResultHandlers.print()
