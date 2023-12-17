@@ -58,4 +58,29 @@ public class AuthControllerIntegrationTest {
         );
     }
 
+    @Test
+    public void Should_ReturnUnauthorized_When_LoginFail() throws Exception {
+        UserRequest userDTO = new UserRequest("int-test", "int@test.com", "int-test");
+        userController.saveUser(userDTO);
+
+        AuthRequest authRequest = new AuthRequest("int@test.com", "int-test");
+        ResponseEntity token = authController.login(authRequest);
+        
+        mockMvc.perform(
+            MockMvcRequestBuilders.post("/sign-in")
+                .content("""
+                    {
+                        "email": "int@test.com",
+                        "password": "wrong"
+                    }
+                """)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(
+            MockMvcResultHandlers.print()
+        ).andExpect(
+            MockMvcResultMatchers.status().isUnauthorized()
+        );
+    }
+
 }
