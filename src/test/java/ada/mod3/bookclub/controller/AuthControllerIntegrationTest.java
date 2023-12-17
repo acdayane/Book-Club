@@ -33,17 +33,17 @@ public class AuthControllerIntegrationTest {
 
     @Test
     public void Should_ReturnToken_When_LoginSuccess() throws Exception {
-        UserRequest userDTO = new UserRequest("int-test", "int@test.com", "int-test");
+        UserRequest userDTO = new UserRequest("int-test", "int9@test.com", "int-test");
         userController.saveUser(userDTO);
 
-        AuthRequest authRequest = new AuthRequest("int@test.com", "int-test");
+        AuthRequest authRequest = new AuthRequest("int9@test.com", "int-test");
         ResponseEntity token = authController.login(authRequest);
         
         mockMvc.perform(
             MockMvcRequestBuilders.post("/sign-in")
                 .content("""
                     {
-                        "email": "int@test.com",
+                        "email": "int9@test.com",
                         "password": "int-test"
                     }
                 """)

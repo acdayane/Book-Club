@@ -144,7 +144,7 @@ public class UserControllerIntegrationTest {
     public void Should_GetAllUsers() throws Exception {  
         User user = new User();
         user.setName("int-test");
-        user.setEmail("int@test.com");
+        user.setEmail("int1@test.com");
         user.setPassword("int-test");
         userRepository.save(user);
 
@@ -195,24 +195,24 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void Should_GetUserByEmail_When_EmailExists() throws Exception {  
-        UserRequest userDTO = new UserRequest("int-test", "int@test.com", "int-test");
+        UserRequest userDTO = new UserRequest("int-test", "int3@test.com", "int-test");
         userController.saveUser(userDTO);
 
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/user/email/int@test.com")
+            MockMvcRequestBuilders.get("/user/email/int3@test.com")
                 .accept(MediaType.APPLICATION_JSON)
         ).andDo(
             MockMvcResultHandlers.print()
         ).andExpect(
             MockMvcResultMatchers.status().is2xxSuccessful()
         ).andExpect(
-            MockMvcResultMatchers.jsonPath("$.email").value("int@test.com")
+            MockMvcResultMatchers.jsonPath("$.email").value("int3@test.com")
         );
     }
 
     @Test
     public void Should_GetAllUsersByName_WhenStringExists() throws Exception {  
-        UserRequest userDTO = new UserRequest("int-test", "int@test.com", "int-test");
+        UserRequest userDTO = new UserRequest("int-test", "int2@test.com", "int-test");
         userController.saveUser(userDTO);
 
         mockMvc.perform(
