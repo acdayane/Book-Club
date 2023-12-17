@@ -41,9 +41,11 @@ public class UserControllerIntegrationTest {
         mockMvc.perform(
             MockMvcRequestBuilders.post("/user/sign-up")
                 .content("""
-                    "name": "int-test",
-                    "email": "int@test.com",
-                    "password: "123"
+                    {
+                        "name": "int-test",
+                        "email": "int@test.com",
+                        "password: "123"
+                    }
                 """)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)

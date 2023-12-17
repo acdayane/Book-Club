@@ -34,14 +34,14 @@ public class BookGenreControllerIntegrationTest {
     public void Should_Answer4xx_When_TrySaveInvalidBookGenre() throws Exception {
         mockMvc.perform(
             MockMvcRequestBuilders.post("/book-genre")
-                .content("""                            
+                .content("""
                         """)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
         ).andDo(
             MockMvcResultHandlers.print()
-        ).andExpect(
-            MockMvcResultMatchers.status().is4xxClientError()
+            ).andExpect(
+                MockMvcResultMatchers.status().is4xxClientError()
         );
     }
 
