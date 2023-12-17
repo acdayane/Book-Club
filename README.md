@@ -1,4 +1,13 @@
-# BookClub
+# BookClub Update! 📚
+## Curso Testes Automatizados - Back-end Java | Ada e BTG
+
+## Requisitos do projeto:
+
+- Testes de integração;
+- Testes unitários;
+- [Testes end-to-end](https://github.com/acdayane/Book-Club-end-to-end--tests);
+
+# BookClub 📚
 ## Curso Programação Web II - Back-end Java | Ada e BTG
 
 ## Requisitos do projeto:
